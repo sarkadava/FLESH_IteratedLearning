@@ -94,7 +94,7 @@
         <Long>0</Long>
     </pref>
     <pref key="MediaTime">
-        <Long>5188</Long>
+        <Long>300</Long>
     </pref>
     <prefGroup key="TierColors">
         <pref key="movement_in_trial">
