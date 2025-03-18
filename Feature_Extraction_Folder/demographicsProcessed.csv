@@ -1,0 +1,58 @@
+participantID,Age,BirthPlace,Gender,NativeLanguages,NumOfNativeLanguages,Other Languages,TotalLanguages,Extroversion,Hand
+1,26,Osnabrück ,Woman / Weiblich,German,1,"Englisch (fluent), Spanish (basic)",3,40,Right-handed / Rechtshänder*in
+2,24,Regensburg,Prefer not to say / Keine Angabe,Deutsch,1,"English (fluent), French (fluent), Spanish (good knowledge), Italian (basic), Russian (basic), Vietnamese (basic)",7,17,Right-handed / Rechtshänder*in
+3,32,Germany,Woman / Weiblich,Deutsch,1,"English (fluent), Japanese(basic)",3,60,Right-handed / Rechtshänder*in
+4,60,Berlin,Woman / Weiblich,Deutsch ,1,Englisch fließend und französisch Grundkenntnisse ,3,86,Right-handed / Rechtshänder*in
+5,59,Berlin ,Man / Männlich,Deutsch,1,Englisch,2,66,Right-handed / Rechtshänder*in
+6,24,China,Woman / Weiblich,Chinese,1,"English - fluent, German - basic knowledge ",3,71,Right-handed / Rechtshänder*in
+7,50,England,Woman / Weiblich,Englisch,1,German fluent ,2,40,Left-handed / Linkshänder*in
+8,24,Viersen,Woman / Weiblich,"Deutsch, Russisch, Komi, Englisch",4,Spanisch (gute Kenntnisse),5,54,Right-handed / Rechtshänder*in
+9,58,Berlin ,Woman / Weiblich,Deutsch,1,No,1,50,Left-handed / Linkshänder*in
+10,25,Guayaquil,Man / Männlich,Spanisch ,1,English and German (fluent),3,70,Right-handed / Rechtshänder*in
+11,25,Kolumbien,Woman / Weiblich,Spanisch,1,"English (fluent), german (fluent), italian (basic knowledge)",4,76,Right-handed / Rechtshänder*in
+12,25,"Hamburg, Germany",Man / Männlich,German,1,"English (fluent), Spanish (fluent), French (basic)",4,55,Right-handed / Rechtshänder*in
+13,10,Berlin,Woman / Weiblich,Deutsch,1,Englisch ,2,50,Left-handed / Linkshänder*in
+14,11,Berlin,Man / Männlich,Deutsch,1,Englisch (basic),2,40,Right-handed / Rechtshänder*in
+15,44,Bünde,Woman / Weiblich,Deutsch,1,"English (fluent), French (Fluent), Spanish (basic), Polish (basic)",5,70,Right-handed / Rechtshänder*in
+16,27,Deutschland,Man / Männlich,Deutsch ,1,English,2,30,Right-handed / Rechtshänder*in
+18,19,Berlin,Woman / Weiblich,Deutsch,1,Englisch ,2,64,Right-handed / Rechtshänder*in
+19,57,Leipzig ,Woman / Weiblich,Deutsch ,1,Englisch ,2,39,Right-handed / Rechtshänder*in
+21,22,Berlin,Non-binary / Nicht-binär,Deutsch,1,"English (fluent), Estonia (basic knowledge)",3,50,Right-handed / Rechtshänder*in
+21,22,2002,Woman / Weiblich,Deutsch,1,"English (fluent), Spanisch (Fortgeschrittene) ",3,30,Right-handed / Rechtshänder*in
+23,35,Deutschland ,Woman / Weiblich,Deutsch ,1,"English (fluent), French (advanced), Italian (beginner)",4,43,Right-handed / Rechtshänder*in
+24,66,Berlin,Woman / Weiblich,Deutsch,1,"English(fluent), French (basic),Russian (basic),Basque (basic)",5,60,Right-handed / Rechtshänder*in
+25,33,Iran,Man / Männlich,Persian,1,Englisch (fluent),2,80,Right-handed / Rechtshänder*in
+27,13,Berlin ,Woman / Weiblich,"German, French",2,English Estonian. Esperanto,5,73,Right-handed / Rechtshänder*in
+28,80,chemnitz,Woman / Weiblich,Deutsch ,1,Keine ,1,80,Right-handed / Rechtshänder*in
+29,69,Muenchen,Woman / Weiblich,deutsch ,1,"English,  French,  Turkish ",4,45,Right-handed / Rechtshänder*in
+30,45,Dresden,Woman / Weiblich,Deutsch,1,Englisch,2,51,Right-handed / Rechtshänder*in
+31,36,"Germany, dessau ",Woman / Weiblich,German ,1,"English (fluent), Swedish (good), Italian (basic), French (basic) ",5,12,Right-handed / Rechtshänder*in
+32,24,Berlin,Woman / Weiblich,Deutsch,1,"Englisch - fließend, Deutsche Gebärdensprache - gute Kenntnisse, Französisch - Grundkenntnisse",4,41,Right-handed / Rechtshänder*in
+33,55,Westfalen ,Man / Männlich,Deutsch,1,Englisch schlecht,2,80,Right-handed / Rechtshänder*in
+34,14,Berlin,Man / Männlich,"Schweizerdeutsch, deutsch, österreichisch",3,"Englisch (Grundkenntnisse), Deutsch (fließend)",5,61,Right-handed / Rechtshänder*in
+35,15,Berlin,Man / Männlich,"Deutsch, Bayrischer Akzent( Niedeerbayern)",2,English(fließend) Französisch(gute Kenntnisse),4,43,Right-handed / Rechtshänder*in
+36,15,2008,Man / Männlich,Deutsch,1,"English(fluent), french (basic knowledge)",3,45,Right-handed / Rechtshänder*in
+37,52,Österreich,Woman / Weiblich,"Österreichisch, deutsch",2,Englisch (fließend),3,74,Right-handed / Rechtshänder*in
+38,9,Berlin,Woman / Weiblich,Deutsch,1,English basic,2,48,Left-handed / Linkshänder*in
+39,39,Berlin,Woman / Weiblich,Deutsch ,1,"English fluent, Spanisch basic",3,41,Left-handed / Linkshänder*in
+41,29,Salzgitter,Woman / Weiblich,Deutsch,1,"English (fluent), Spanish (good)",3,50,Right-handed / Rechtshänder*in
+42,35,chisinau,Man / Männlich,"Deutsch, Russisch ",2,"englisch (fließend), spanisch (Grundkenntnisse)",4,30,Right-handed / Rechtshänder*in
+43,41,Vienna ,Woman / Weiblich,English ,1,German (fluent) Spanish (fluent) French (intermidiate) mandarin Chinese (beginner),5,73,Right-handed / Rechtshänder*in
+44,28,Italy,Woman / Weiblich,Italienisch,1,"Deutsch (fließend), Englisch (fließend), Spanisch (gut), Portugiesisch (Grundkenntnisse)",5,46,Right-handed / Rechtshänder*in
+45,43,Brazil,Woman / Weiblich,Portuguese,1,"English (fluent), German (fluent), Italian (basic)",4,50,Right-handed / Rechtshänder*in
+46,26,Weimar,Woman / Weiblich,German ,1,"English (fluent), Spanish (B1) ",3,75,Right-handed / Rechtshänder*in
+47,23,Freudenstadt ,Woman / Weiblich,Deutsch,1,"Englisch (fließend), Spanisch (Grundkenntnisse)",3,62,Right-handed / Rechtshänder*in
+48,28,Greece,Woman / Weiblich,Greek,1,Greek- basic,1,28,Right-handed / Rechtshänder*in
+49,50,Düsseldorf ,Man / Männlich,Deutsch,1,"English (fluent), French (Grundkenntnisse)",3,80,Right-handed / Rechtshänder*in
+50,62,Deutschland ,Man / Männlich,deutsch ,1,Englisch ,2,75,Right-handed / Rechtshänder*in
+51,21,Berlin,Man / Männlich,Deutsch ,1,Italienisch (Grundkenntnisse),2,60,Right-handed / Rechtshänder*in
+52,21,Berlin,Man / Männlich,Deutsch,1,"Englisch- sehr gut, Italienisch - grundlegend",3,53,Right-handed / Rechtshänder*in
+53,32,Germany,Woman / Weiblich,German,1,"English (fließend), Deutsch (fließend)",3,50,Right-handed / Rechtshänder*in
+54,26,Berlin ,Non-binary / Nicht-binär,German ,1,Englisch (Basic) ,2,70,Right-handed / Rechtshänder*in
+55,20,Coimbra,Woman / Weiblich,"Deutsch, Portugiesisch",2,"englisch (fluent), französisch (grundkenntnisse)",4,30,Right-handed / Rechtshänder*in
+56,21,Berlin,Man / Männlich,"Deutsch, Englisch",2,non,2,80,Right-handed / Rechtshänder*in
+57,50,Deutschland ,Woman / Weiblich,Deutsch ,1,Englisch (fließend),2,30,Right-handed / Rechtshänder*in
+58,28,Deutschland ,Man / Männlich,Deutsch ,1,Englisch (fließend),2,60,Right-handed / Rechtshänder*in
+59,27,"Deutschland, Gera",Woman / Weiblich,Deutsch,1,"Englisch (gute Kenntnisse), französisch (Grundkenntnisse)",3,40,Right-handed / Rechtshänder*in
+60,35,Germany,Man / Männlich,German,1,English (fluent),2,85,Right-handed / Rechtshänder*in
+2w,59,Lüdenscheid ,Woman / Weiblich,Deutsch ,1,"Englisch fließend, französisch Grundkenntnisse",3,69,Right-handed / Rechtshänder*in
