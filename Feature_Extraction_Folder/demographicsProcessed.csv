@@ -15,6 +15,7 @@ participantID,Age,BirthPlace,Gender,NativeLanguages,NumOfNativeLanguages,Other L
 14,11,Berlin,Man / Männlich,Deutsch,1,Englisch (basic),2,40,Right-handed / Rechtshänder*in
 15,44,Bünde,Woman / Weiblich,Deutsch,1,"English (fluent), French (Fluent), Spanish (basic), Polish (basic)",5,70,Right-handed / Rechtshänder*in
 16,27,Deutschland,Man / Männlich,Deutsch ,1,English,2,30,Right-handed / Rechtshänder*in
+17,,,Woman / Weiblich,,,,,,
 18,19,Berlin,Woman / Weiblich,Deutsch,1,Englisch ,2,64,Right-handed / Rechtshänder*in
 19,57,Leipzig ,Woman / Weiblich,Deutsch ,1,Englisch ,2,39,Right-handed / Rechtshänder*in
 21,22,Berlin,Non-binary / Nicht-binär,Deutsch,1,"English (fluent), Estonia (basic knowledge)",3,50,Right-handed / Rechtshänder*in
@@ -22,6 +23,7 @@ participantID,Age,BirthPlace,Gender,NativeLanguages,NumOfNativeLanguages,Other L
 23,35,Deutschland ,Woman / Weiblich,Deutsch ,1,"English (fluent), French (advanced), Italian (beginner)",4,43,Right-handed / Rechtshänder*in
 24,66,Berlin,Woman / Weiblich,Deutsch,1,"English(fluent), French (basic),Russian (basic),Basque (basic)",5,60,Right-handed / Rechtshänder*in
 25,33,Iran,Man / Männlich,Persian,1,Englisch (fluent),2,80,Right-handed / Rechtshänder*in
+26,,,Woman / Weiblich,,,,,,
 27,13,Berlin ,Woman / Weiblich,"German, French",2,English Estonian. Esperanto,5,73,Right-handed / Rechtshänder*in
 28,80,chemnitz,Woman / Weiblich,Deutsch ,1,Keine ,1,80,Right-handed / Rechtshänder*in
 29,69,Muenchen,Woman / Weiblich,deutsch ,1,"English,  French,  Turkish ",4,45,Right-handed / Rechtshänder*in
@@ -55,4 +57,4 @@ participantID,Age,BirthPlace,Gender,NativeLanguages,NumOfNativeLanguages,Other L
 58,28,Deutschland ,Man / Männlich,Deutsch ,1,Englisch (fließend),2,60,Right-handed / Rechtshänder*in
 59,27,"Deutschland, Gera",Woman / Weiblich,Deutsch,1,"Englisch (gute Kenntnisse), französisch (Grundkenntnisse)",3,40,Right-handed / Rechtshänder*in
 60,35,Germany,Man / Männlich,German,1,English (fluent),2,85,Right-handed / Rechtshänder*in
-2w,59,Lüdenscheid ,Woman / Weiblich,Deutsch ,1,"Englisch fließend, französisch Grundkenntnisse",3,69,Right-handed / Rechtshänder*in
+22,59,Lüdenscheid ,Woman / Weiblich,Deutsch ,1,"Englisch fließend, französisch Grundkenntnisse",3,69,Right-handed / Rechtshänder*in
