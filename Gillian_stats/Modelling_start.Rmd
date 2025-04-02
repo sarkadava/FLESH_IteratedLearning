@@ -44,10 +44,8 @@ library(ggplot2)
 library(tibble)
 library(rcartocolor)
 
-
 library(ggdag) # for dag
 library(dagitty)
-
 
 library(ggplot2) # bayesian stuff
 library(patchwork)
@@ -60,7 +58,7 @@ library(tidyverse)
 # current folder (first go to session -> set working directory -> to source file location)
 parentfolder <- dirname(getwd())
 
-datasets      <- paste0(parentfolder, '/Gillian_stats/datasets/') # This line is different on mac and other devices
+datasets      <- paste0(parentfolder, '/Gillian_stats/datasets/') # This line is different on mac and others
 models        <- paste0(parentfolder, '/Gillian_stats/models/')
 plots         <- paste0(parentfolder, '/Gillian_stats/plots/')
 
@@ -80,9 +78,7 @@ options(mc.cores = parallel::detectCores())
 data <- read_csv(paste0(datasets, "final_stats_dataframe.csv"))
 ```
 
-Here we look into structure of our data
-
-- what is distribution of gender, age, extroversion, number of languages for example
+Here we look into structure of our data: what is distribution of gender, age, extroversion, number of languages for example
 
 ```{r h1 visualizing data, message=FALSE, warning=FALSE}
 hist(data$Extroversion)
@@ -106,14 +102,37 @@ data$Extroversion <- as.numeric(data$Extroversion)
 data$generation_number <- as.numeric(data$generation_number)
 
 ```
+## Data wrangling
 
-# Question One - gesture space, temporal variability, entropy
+To have easier interpretation of the data, we will center the generation number. With that, our estimate of the intercept will always apply for generation in the middle. Otherwise, it would be estimate for the first generation
 
-Here we start to focus on our first question
+```{r}
+
+data$generation_number_c <- data$generation_number - median(range(data$generation_number))
+```
+Below, we adjust all of the entropy data by a constant (half the value of the minimum value), so we don't have any zeros in our data. (This is reasonable because zero entropy doesn't make sense anyway).
+```{r}
+c <- min(data$total_body_entropy2D[data$total_body_entropy2D > 0]) / 2 # decide on a constant
+data$entropy_shifted <- data$total_body_entropy2D + c  # Shift all values
+c2 <-min(data$total_body_variability2D[data$total_body_variability2D > 0]) / 2
+data$variability_shifted <- data$total_body_variability2D + c2
+```
+
+# Question One, part one: Generation v gesture space
+
+Below, we start to focus on our first question (part one: gesture space)
 
 1) We hypothesize that gesture space decreases as a function of generation.
+First, we look at the distribution of the gesture space data.
 
-Here we look at how the question is answered purely by the data:
+Results: It seems to be that there is a lognormal distribution.
+```{r}
+hist(data$total_gesture_space2D)
+```
+
+Below, we look at how our first question is answered purely by the data. We plot generation vs total gesture space. 
+
+Result analysis: Based on the graph below, it seems as if there is a tiny tiny increase across generations, but it is very hard to tell if there is any pattern at all.
 
 ```{r}
 
@@ -126,24 +145,7 @@ ggplot(data, aes(x = generation_number, y = total_gesture_space2D)) +
   theme_minimal()
 
 ```
-
-Look at the distribution of the outcome:
-
-```{r}
-
-hist(data$total_gesture_space2D)
-
-```
-
-## Data wrangling
-
-To have easier interpretation of the data, we will center the generation number. With that, our estimate of the intercept (here gesture space) will always apply for generation in the middle. Otherwise, it would be estimate for the first generation
-
-```{r}
-
-data$generation_number_c <- data$generation_number - median(range(data$generation_number))
-
-```
+##We now test four different models to understand relation between generation and gesture space.
 
 ## Model 1 - intercept only
 
@@ -182,25 +184,23 @@ m1.gs_R2 <- readRDS(file.path(models, "m1.gs_R2.rds"))
 summary(m1.gs)
 
 ```
-
-
 Let's also check the visuals
 
 ```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
 
-plot(m1.et)
+plot(m1.gs)
 # make some comments of what you see - do you see nice hairy catterpillars?
 
-plot(conditional_effects(m1.et), points = TRUE)
+plot(conditional_effects(m1.gs), points = TRUE)
 # also here about what effect you see or not see
 
-pp_check(m1.et, type = "dens_overlay")
+pp_check(m1.gs, type = "dens_overlay")
 # how well does the model predict future data?
 
-pp_check(m1.et, type = "error_scatter_avg")
+pp_check(m1.gs, type = "error_scatter_avg")
 # how are the values correlated with residual error?
 
-m1.et_R2
+m1.gs_R2
 # how much variance the model explains? 
 
 ```
@@ -334,18 +334,46 @@ m3.gs_R2
 
 ```
 
+## MODEL FOUR: (Investigate other fixed effects)
+In this model, we investigate the effects of Age, Extroversion, and Gender. Thus, we begin by plotting the relationships between them. 
+
+Age:
 ```{r}
 
 ggplot(data, aes(x = Age, y = total_gesture_space2D)) +
   geom_point(alpha = 0.5) +  # Scatter plot with transparency
   geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
-  labs(x = "Generation Number", 
-       y = "age", 
-       title = "Linear Relationship between Generation Number and Gesture space") +
+  labs(x = "Age", 
+       y = "Gesture Space", 
+       title = "Linear Relationship between Age and Gesture space") +
   theme_minimal()
 
 ```
+Extroversion
+```{r}
 
+ggplot(data, aes(x = Extroversion, y = total_gesture_space2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Extroversion", 
+       y = "Gesture Space", 
+       title = "Linear Relationship between Extroversion and Gesture space") +
+  theme_minimal()
+
+```
+Gender
+```{r}
+
+ggplot(data, aes(x = Gender, y = total_gesture_space2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Gender", 
+       y = "Gesture Space", 
+       title = "Linear Relationship between Extroversion and Gesture space") +
+  theme_minimal()
+
+```
+#Models 4:
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m4.gs <- brm(
@@ -394,7 +422,620 @@ pp_check(m4.gs, type = "error_scatter_avg")
 
 
 m4.gs_R2
+
+
 ```
+# Question One, part two: Generation v Entropy
+Here we continue our first question (part two: entropy)
+
+1) We hypothesize that entropy decreases as a function of generation.
+
+Here we look at how the question is answered purely by the data:
+
+```{r}
+
+ggplot(data, aes(x = generation_number, y = entropy_shifted)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Generation Number", 
+       y = "entropy_shifted", 
+       title = "Linear Relationship between Generation Number and Gesture space") +
+  theme_minimal()
+
+```
+
+Look at the distribution of the outcome:
+
+```{r}
+
+hist(data$entropy_shifted)
+
+```
+
+## Model 1 - intercept only
+
+This is the model
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m1.et <- brm(
+  entropy_shifted ~ generation_number_c, 
+  data = data,
+  family = gaussian(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m1.et <- add_criterion(m1.et, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m1.et_R2 <- bayes_R2(m1.et)
+
+# Save both as objects
+saveRDS(m1.et, file.path(models, "m1.et.rds"))
+saveRDS(m1.et_R2, file.path(models, "m1.et_R2.rds"))
+
+beep(5)
+
+```
+
+Here we load the model so that we don't have to run the model again
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m1.et <- readRDS(file.path(models, "m1.et.rds"))
+m1.et_R2 <- readRDS(file.path(models, "m1.et_R2.rds"))
+
+
+# Summary
+summary(m1.et)
+
+```
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m1.et)
+# make some comments of what you see - do you see nice hairy catterpillars?
+
+plot(conditional_effects(m1.et), points = TRUE)
+# also here about what effect you see or not see
+
+pp_check(m1.et, type = "dens_overlay")
+# how well does the model predict future data?
+
+pp_check(m1.et, type = "error_scatter_avg")
+# how are the values correlated with residual error?
+
+m1.et_R2
+# how much variance the model explains? 
+
+```
+Now we are not happy, because for example ppcheck reveals that...
+
+As we inspected the outcome variable, we think that lognormal family could be maybe more appropriate. So we try it 
+
+## Model 2 lognormal
+
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m2.et <- brm(
+  entropy_shifted ~ generation_number_c, 
+  data = data,
+  family = lognormal(),  # Here we change lognormal
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m2.et <- add_criterion(m2.et, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m2.et_R2 <- bayes_R2(m2.et)
+
+# Save both as objects
+saveRDS(m2.et, file.path(models, "m2.et.rds"))
+saveRDS(m2.et_R2, file.path(models, "m2.et_R2.rds"))
+
+
+beep(5)
+
+```
+ 
+And we do the same procedure
+
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m2.et <- readRDS(file.path(models, "m2.et.rds"))
+m2.et_R2 <- readRDS(file.path(models, "m2.et_R2.rds"))
+
+
+# Summary
+summary(m2.et)
+
+```
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m2.et)
+# comments
+
+plot(conditional_effects(m2.et), points = TRUE)
+# comments
+
+pp_check(m2.et, type = "dens_overlay")
+# comments
+
+pp_check(m2.et, type = "error_scatter_avg")
+# comments
+
+m2.et_R2
+# comments
+
+```
+
+We are still not acknowledging some structures of the data to the model. There is some variance coming from XYZ. So we want to add it into the model too
+
+## Model 3 - lognormal with random effects
+
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m3.et <- brm(
+  entropy_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 4000, warmup = 2000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m3.et <- add_criterion(m3.et, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m3.et_R2 <- bayes_R2(m3.et)
+
+# Save both as objects
+saveRDS(m3.et, file.path(models, "m3.et.rds"))
+saveRDS(m3.et_R2, file.path(models, "m3.et_R2.rds"))
+
+
+beep(5)
+
+```
+
+And once again we do all over the whole procedure
+
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m3.et <- readRDS(file.path(models, "m3.et.rds"))
+m3.et_R2 <- readRDS(file.path(models, "m3.et_R2.rds"))
+
+
+# Summary
+summary(m3.et)
+
+```
+
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m3.et)
+
+#
+
+plot(conditional_effects(m3.et), points = TRUE)
+#
+
+pp_check(m3.et, type = "dens_overlay")
+# 
+
+pp_check(m3.et, type = "error_scatter_avg")
+# 
+
+
+m3.et_R2
+# 
+
+```
+## MODEL FOUR: (Investigate other fixed effects)
+In this model, we investigate the effects of Age, Extroversion, and Gender. Thus, we begin by plotting the relationships between them. 
+
+Age:
+```{r}
+
+ggplot(data, aes(x = Age, y = entropy_shifted)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Age", 
+       y = "Entropy", 
+       title = "Linear Relationship between Age and Entropy") +
+  theme_minimal()
+
+```
+Extroversion
+```{r}
+
+ggplot(data, aes(x = Extroversion, y = entropy_shifted)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Extroversion", 
+       y = "Entropy", 
+       title = "Linear Relationship between Extroversion and Entropy") +
+  theme_minimal()
+
+```
+Gender
+```{r}
+
+ggplot(data, aes(x = Gender, y = entropy_shifted)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Gender", 
+       y = "Entropy", 
+       title = "Linear Relationship between Gender and Entropy") +
+  theme_minimal()
+
+```
+
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m4.et <- brm(
+  entropy_shifted ~ generation_number_c + Age + Extroversion + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m4.et <- add_criterion(m4.et, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m4.et_R2 <- bayes_R2(m4.et)
+
+# Save both as objects
+saveRDS(m4.et, file.path(models, "m4.et.rds"))
+saveRDS(m4.et_R2, file.path(models, "m4.et_R2.rds"))
+
+
+beep(5)
+
+m4.et <- readRDS(file.path(models, "m4.et.rds"))
+m4.et_R2 <- readRDS(file.path(models, "m4.et_R2.rds"))
+
+
+# Summary
+summary(m4.et)
+
+```
+Let's also check visuals
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m4.et)
+
+#
+
+plot(conditional_effects(m4.et), points = TRUE)
+#
+
+pp_check(m4.et, type = "dens_overlay")
+# 
+
+pp_check(m4.et, type = "error_scatter_avg")
+# 
+
+
+m4.et_R2
+```
+
+# Question One, part three: Generation v Temporal Variability
+Here we continue our first question (part two: entropy)
+
+1) We hypothesize that temporal variability decreases as a function of generation.
+
+Here we look at how the question is answered purely by the data:
+
+```{r}
+
+ggplot(data, aes(x = generation_number, y = total_body_variability2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Generation Number", 
+       y = "Temporal Variability", 
+       title = "Linear Relationship between Generation Number and Temporal Variability") +
+  theme_minimal()
+
+```
+
+Look at the distribution of the outcome:
+
+```{r}
+
+hist(data$total_body_variability2D)
+
+```
+
+## Model 1 - intercept only
+
+This is the model
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m1.tv <- brm(
+  variability_shifted ~ generation_number_c, 
+  data = data,
+  family = gaussian(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m1.tv <- add_criterion(m1.et, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m1.tv_R2 <- bayes_R2(m1.tv)
+
+# Save both as objects
+saveRDS(m1.tv, file.path(models, "m1.tv.rds"))
+saveRDS(m1.tv_R2, file.path(models, "m1.tv_R2.rds"))
+
+beep(5)
+
+```
+
+Here we load the model so that we don't have to run the model again
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m1.tv <- readRDS(file.path(models, "m1.tv.rds"))
+m1.tv_R2 <- readRDS(file.path(models, "m1.tv_R2.rds"))
+
+
+# Summary
+summary(m1.tv)
+
+```
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m1.tv)
+# make some comments of what you see - do you see nice hairy catterpillars?
+
+plot(conditional_effects(m1.tv), points = TRUE)
+# also here about what effect you see or not see
+
+pp_check(m1.tv, type = "dens_overlay")
+# how well does the model predict future data?
+
+pp_check(m1.tv, type = "error_scatter_avg")
+# how are the values correlated with residual error?
+
+m1.tv_R2
+# how much variance the model explains? 
+
+```
+Now we are not happy, because for example ppcheck reveals that...
+
+As we inspected the outcome variable, we think that lognormal family could be maybe more appropriate. So we try it 
+
+## Model 2 lognormal
+
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m2.tv <- brm(
+  variability_shifted ~ generation_number_c, 
+  data = data,
+  family = lognormal(),  # Here we change lognormal
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m2.tv <- add_criterion(m2.tv, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m2.tv_R2 <- bayes_R2(m2.tv)
+
+# Save both as objects
+saveRDS(m2.tv, file.path(models, "m2.tv.rds"))
+saveRDS(m2.tv_R2, file.path(models, "m2.tv_R2.rds"))
+
+
+beep(5)
+
+```
+ 
+And we do the same procedure
+
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m2.tv <- readRDS(file.path(models, "m2.tv.rds"))
+m2.tv_R2 <- readRDS(file.path(models, "m2.tv_R2.rds"))
+
+
+# Summary
+summary(m2.tv)
+
+```
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m2.tv)
+# comments
+
+plot(conditional_effects(m2.tv), points = TRUE)
+# comments
+
+pp_check(m2.tv, type = "dens_overlay")
+# comments
+
+pp_check(m2.tv, type = "error_scatter_avg")
+# comments
+
+m2.tv_R2
+# comments
+
+```
+
+We are still not acknowledging some structures of the data to the model. There is some variance coming from XYZ. So we want to add it into the model too
+
+## Model 3 - lognormal with random effects
+
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m3.tv <- brm(
+  variability_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 4000, warmup = 2000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m3.tv <- add_criterion(m3.tv, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m3.tv_R2 <- bayes_R2(m3.tv)
+
+# Save both as objects
+saveRDS(m3.tv, file.path(models, "m3.tv.rds"))
+saveRDS(m3.tv_R2, file.path(models, "m3.tv_R2.rds"))
+
+
+beep(5)
+
+```
+
+And once again we do all over the whole procedure
+
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m3.tv <- readRDS(file.path(models, "m3.tv.rds"))
+m3.tv_R2 <- readRDS(file.path(models, "m3.tv_R2.rds"))
+
+
+# Summary
+summary(m3.tv)
+
+```
+
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m3.tv)
+
+#
+
+plot(conditional_effects(m3.tv), points = TRUE)
+#
+
+pp_check(m3.tv, type = "dens_overlay")
+# 
+
+pp_check(m3.tv, type = "error_scatter_avg")
+# 
+
+m3.tv_R2
+# 
+
+```
+## MODEL FOUR: (Investigate other fixed effects)
+In this model, we investigate the effects of Age, Extroversion, and Gender. Thus, we begin by plotting the relationships between them. 
+
+Age:
+```{r}
+
+ggplot(data, aes(x = Age, y = total_body_variability2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Age", 
+       y = "Temporal Variability", 
+       title = "Linear Relationship between Age and Gesture space") +
+  theme_minimal()
+
+```
+Extroversion
+```{r}
+
+ggplot(data, aes(x = Extroversion, y = total_body_variability2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Extroversion", 
+       y = "Temporal Variability", 
+       title = "Linear Relationship between Extroversion and Temporal Variability") +
+  theme_minimal()
+
+```
+Gender
+```{r}
+
+ggplot(data, aes(x = Gender, y = total_body_variability2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Gender", 
+       y = "Temporal Variability", 
+       title = "Linear Relationship between Gender and Temporal Variability") +
+  theme_minimal()
+
+```
+
+```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+
+m4.tv <- brm(
+  variability_shifted ~ generation_number_c + Age + Extroversion + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+# Add criterions for later diagnostics
+m4.tv <- add_criterion(m4.gs, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m4.tv_R2 <- bayes_R2(m4.tv)
+
+# Save both as objects
+saveRDS(m4.tv, file.path(models, "m4.tv.rds"))
+saveRDS(m4.tv_R2, file.path(models, "m4.tv_R2.rds"))
+
+
+beep(5)
+
+m4.tv <- readRDS(file.path(models, "m4.tv.rds"))
+m4.tv_R2 <- readRDS(file.path(models, "m4.tv_R2.rds"))
+
+
+# Summary
+summary(m4.tv)
+
+```
+Let's also check visuals
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m4.tv)
+
+#
+
+plot(conditional_effects(m4.tv), points = TRUE)
+#
+
+pp_check(m4.tv, type = "dens_overlay")
+# 
+
+pp_check(m4.tv, type = "error_scatter_avg")
+# 
+
+
+m4.tv_R2
+```
+
 
 ### Converting to original scale
 
