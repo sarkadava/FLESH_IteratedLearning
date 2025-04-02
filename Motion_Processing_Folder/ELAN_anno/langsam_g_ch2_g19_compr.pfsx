@@ -17,7 +17,7 @@
         <Int>428</Int>
     </pref>
     <pref key="SelectionEndTime">
-        <Long>9039</Long>
+        <Long>8700</Long>
     </pref>
     <pref key="LayoutManager.CurrentMode">
         <Int>1</Int>
@@ -73,7 +73,7 @@
         <Object class="java.awt.Point">0,25</Object>
     </pref>
     <pref key="SelectionBeginTime">
-        <Long>1150</Long>
+        <Long>8210</Long>
     </pref>
     <prefGroup key="BAS - WebMAUS Basic">
         <pref key="LANGUAGE">
@@ -94,7 +94,7 @@
         <Long>0</Long>
     </pref>
     <pref key="MediaTime">
-        <Long>6800</Long>
+        <Long>8700</Long>
     </pref>
     <prefGroup key="TierColors">
         <pref key="movement_in_trial">

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ANNOTATION_DOCUMENT AUTHOR="Generated" DATE="2025-01-07T21:58:02+01:00"
+<ANNOTATION_DOCUMENT AUTHOR="Generated" DATE="2025-04-01T19:00:14-05:00"
     FORMAT="3.0" VERSION="3.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.mpi.nl/tools/elan/EAFv3.0.xsd">
     <HEADER MEDIA_FILE="" TIME_UNITS="milliseconds">
         <MEDIA_DESCRIPTOR
-            MEDIA_URL="/Users/gillianrosenberg/Desktop/Flesh1/Input_Videos/langsam_g_ch2_g19_compr.mp4"
-            MIME_TYPE="video/mp4" RELATIVE_MEDIA_URL="../Input_Videos/langsam_g_ch2_g19_compr.mp4"/>
+            MEDIA_URL="file:///Users/gillianrosenberg/Desktop/langsam_g_ch2_g19_compr.mp4"
+            MIME_TYPE="video/mp4" RELATIVE_MEDIA_URL="../../../../../Desktop/langsam_g_ch2_g19_compr.mp4"/>
         <PROPERTY NAME="URN">urn:nl-mpi-tools-elan-eaf:a0c7a1eb-9d89-4ce7-a531-04c2cd34823d</PROPERTY>
         <PROPERTY NAME="lastUsedAnnotationId">5</PROPERTY>
     </HEADER>
@@ -14,15 +14,15 @@
         <TIME_SLOT TIME_SLOT_ID="ts2" TIME_VALUE="1150"/>
         <TIME_SLOT TIME_SLOT_ID="ts3" TIME_VALUE="1150"/>
         <TIME_SLOT TIME_SLOT_ID="ts4" TIME_VALUE="1271"/>
-        <TIME_SLOT TIME_SLOT_ID="ts5" TIME_VALUE="11172"/>
-        <TIME_SLOT TIME_SLOT_ID="ts6" TIME_VALUE="11172"/>
-        <TIME_SLOT TIME_SLOT_ID="ts7" TIME_VALUE="11172"/>
-        <TIME_SLOT TIME_SLOT_ID="ts8" TIME_VALUE="11172"/>
+        <TIME_SLOT TIME_SLOT_ID="ts5" TIME_VALUE="8180"/>
+        <TIME_SLOT TIME_SLOT_ID="ts6" TIME_VALUE="8180"/>
+        <TIME_SLOT TIME_SLOT_ID="ts7" TIME_VALUE="8180"/>
+        <TIME_SLOT TIME_SLOT_ID="ts8" TIME_VALUE="8180"/>
     </TIME_ORDER>
     <TIER LINGUISTIC_TYPE_REF="default-lt" TIER_ID="movement_in_trial">
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a1"
-                TIME_SLOT_REF1="ts1" TIME_SLOT_REF2="ts5">
+                TIME_SLOT_REF1="ts1" TIME_SLOT_REF2="ts8">
                 <ANNOTATION_VALUE>movement</ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
         </ANNOTATION>
@@ -32,7 +32,7 @@
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a2"
                 CVE_REF="cveid_26ed26e6-f45d-4a41-b9ab-8af7e69ff0e9"
-                TIME_SLOT_REF1="ts2" TIME_SLOT_REF2="ts6">
+                TIME_SLOT_REF1="ts2" TIME_SLOT_REF2="ts7">
                 <ANNOTATION_VALUE>movement</ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
         </ANNOTATION>
@@ -42,7 +42,7 @@
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a3"
                 CVE_REF="cveid_26ed26e6-f45d-4a41-b9ab-8af7e69ff0e9"
-                TIME_SLOT_REF1="ts3" TIME_SLOT_REF2="ts7">
+                TIME_SLOT_REF1="ts3" TIME_SLOT_REF2="ts6">
                 <ANNOTATION_VALUE>movement</ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
         </ANNOTATION>
@@ -52,7 +52,7 @@
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a4"
                 CVE_REF="cveid_26ed26e6-f45d-4a41-b9ab-8af7e69ff0e9"
-                TIME_SLOT_REF1="ts4" TIME_SLOT_REF2="ts8">
+                TIME_SLOT_REF1="ts4" TIME_SLOT_REF2="ts5">
                 <ANNOTATION_VALUE>movement</ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
         </ANNOTATION>
