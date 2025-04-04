@@ -112,7 +112,7 @@ data$generation_number_c <- data$generation_number - median(range(data$generatio
 ```
 Below, we adjust all of the entropy data by a constant (half the value of the minimum value), so we don't have any zeros in our data. (This is reasonable because zero entropy doesn't make sense anyway).
 ```{r}
-c <- min(data$total_body_entropy2D[data$total_body_entropy2D > 0]) / 2 # decide on a constant
+ c <- min(data$total_body_entropy2D[data$total_body_entropy2D > 0]) / 2 # decide on a constant
 data$entropy_shifted <- data$total_body_entropy2D + c  # Shift all values
 c2 <-min(data$total_body_variability2D[data$total_body_variability2D > 0]) / 2
 data$variability_shifted <- data$total_body_variability2D + c2
@@ -256,16 +256,16 @@ plot(m2.gs)
 # comments
 
 plot(conditional_effects(m2.gs), points = TRUE)
-# comments
+# We barely see any slope.
 
 pp_check(m2.gs, type = "dens_overlay")
-# comments
+# Not a bad overlay
 
 pp_check(m2.gs, type = "error_scatter_avg")
-# comments
+# There is a linear correlation it seems which is not good.
 
 m2.gs_R2
-# comments
+# It only explains .7 percent of the data! Yikes!
 
 ```
 
@@ -317,20 +317,20 @@ Let's also check the visuals
 
 plot(m3.gs)
 
-#
+# I am unclear what I am supposed to see here
 
 plot(conditional_effects(m3.gs), points = TRUE)
-#
+# I see almost no slope
 
 pp_check(m3.gs, type = "dens_overlay")
-# 
+# looks pretty accurate?
 
 pp_check(m3.gs, type = "error_scatter_avg")
-# 
+# some correlation, but it also looks like a blob a bit which is good!
 
 
 m3.gs_R2
-# 
+# explains 67.32 of the variance!
 
 ```
 
@@ -361,7 +361,7 @@ ggplot(data, aes(x = Extroversion, y = total_gesture_space2D)) +
   theme_minimal()
 
 ```
-Gender
+Gender - THIS IS THE WRONG TYPE OF PLOT MAYBE?
 ```{r}
 
 ggplot(data, aes(x = Gender, y = total_gesture_space2D)) +
@@ -375,12 +375,29 @@ ggplot(data, aes(x = Gender, y = total_gesture_space2D)) +
 ```
 #Models 4:
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
+# TRIED TO USE THIS MODEL WITH Z_SCORE AND IT DIDN"T GO WELL. kept it here just in case, but I don't use these variables in my model.
+data$z_score_Age <- (data$Age - mean(data$Age, na.rm = TRUE)) / sd(data$Age, na.rm = TRUE)
+data$z_score_Extroversion <- (data$Age - mean(data$Extroversion, na.rm = TRUE)) / sd(data$Extroversion, na.rm = TRUE)
+```
+```{r}
+
+ggplot(data, aes(x = z_score_Age, y = total_gesture_space2D)) +
+  geom_point(alpha = 0.5) +  # Scatter plot with transparency
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +  # Linear trend line with confidence interval
+  labs(x = "Age", 
+       y = "Gesture Space", 
+       title = "Linear Relationship between Age and Gesture space") +
+  theme_minimal()
+
+```
+```{r}
 
 m4.gs <- brm(
-  total_gesture_space2D ~ generation_number_c + Age + Extroversion + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  total_gesture_space2D ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chainID), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
-  chains = 4, iter = 2000, warmup = 1000, cores = 4
+  chains = 4, iter = 2000, warmup = 1000, cores = 4, 
+  control = list(adapt_delta = 0.99)
 )
 
 # Add criterions for later diagnostics
@@ -409,7 +426,7 @@ Let's also check visuals
 
 plot(m4.gs)
 
-#
+# not totally sure how to interpret. 
 
 plot(conditional_effects(m4.gs), points = TRUE)
 #
@@ -423,7 +440,60 @@ pp_check(m4.gs, type = "error_scatter_avg")
 
 m4.gs_R2
 
+```
+# MODEL FIVE: CENTERED AGE AND EXTROVERSION (Doesn't change anything in the end, so you can ignore this one)
+```{r}
+data$Age_c <- data$Age - median(range(data$Age, na.rm = TRUE))
+data$Extroversion_c <- data$Extroversion - median(range(data$Extroversion,na.rm = TRUE))
+```
+```{r}
+m5.gs <- brm(
+  total_gesture_space2D ~ generation_number_c + Age_c + Extroversion_c + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4,
+  save_pars = save_pars(all = TRUE),
+  control = list(adapt_delta = 0.99)
+)
 
+# Add criterions for later diagnostics
+m5.gs <- add_criterion(m5.gs, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m5.gs_R2 <- bayes_R2(m4.gs)
+
+# Save both as objects
+saveRDS(m5.gs, file.path(models, "m5.gs.rds"))
+saveRDS(m5.gs_R2, file.path(models, "m5.gs_R2.rds"))
+
+loo(m5.gs, moment_match = TRUE)
+loo_result <- loo(m5.gs, reloo = TRUE)
+
+beep(5)
+
+m5.gs <- readRDS(file.path(models, "m5.gs.rds"))
+m5.gs_R2 <- readRDS(file.path(models, "m5.gs_R2.rds"))
+
+
+# Summary
+summary(m5.gs)
+
+```
+
+```{r}
+plot(m5.gs)
+# make some comments of what you see - do you see nice hairy catterpillars?
+
+plot(conditional_effects(m5.gs), points = TRUE)
+# also here about what effect you see or not see
+
+pp_check(m5.gs, type = "dens_overlay")
+# how well does the model predict future data?
+
+pp_check(m5.gs, type = "error_scatter_avg")
+# how are the values correlated with residual error?
+
+m5.gs_R2
 ```
 # Question One, part two: Generation v Entropy
 Here we continue our first question (part two: entropy)
@@ -519,12 +589,28 @@ As we inspected the outcome variable, we think that lognormal family could be ma
 
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
+min_value <- min(data$entropy_shifted)
+print(min_value)
+offset <- abs(min_value) + 1e-3
+print(offset)# Ensure all values are strictly positive
+data$entropy_shifted_shifted <- data$entropy_shifted + offset
+summary(data$entropy_shifted_shifted)
+min(data$entropy_shifted_shifted)
+
+offset <- abs(min_value) + 1  # Ensures all values are at least 1
+data$entropy_shifted_shifted <- data$entropy_shifted + offset
+data$log_entropy_shifted <- log(data$entropy_shifted_shifted)
+
+data$log_entropy_shifted <- log(data$entropy_shifted_shifted)
+min(data$log_entropy_shifted)
+
 m2.et <- brm(
-  entropy_shifted ~ generation_number_c, 
+  log_entropy_shifted ~ generation_number_c, 
   data = data,
   family = lognormal(),  # Here we change lognormal
   chains = 4, iter = 2000, warmup = 1000, cores = 4
 )
+
 
 # Add criterions for later diagnostics
 m2.et <- add_criterion(m2.et, criterion = c("loo", "waic"))
@@ -583,7 +669,7 @@ We are still not acknowledging some structures of the data to the model. There i
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m3.et <- brm(
-  entropy_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  log_entropy_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 4000, warmup = 2000, cores = 4
@@ -805,16 +891,16 @@ plot(m1.tv)
 # make some comments of what you see - do you see nice hairy catterpillars?
 
 plot(conditional_effects(m1.tv), points = TRUE)
-# also here about what effect you see or not see
+# I do not see any effect of generation on temporal variability
 
 pp_check(m1.tv, type = "dens_overlay")
-# how well does the model predict future data?
+# Does not predict future data well. 
 
 pp_check(m1.tv, type = "error_scatter_avg")
-# how are the values correlated with residual error?
+# High correlation between values and residentual error which is bad.
 
 m1.tv_R2
-# how much variance the model explains? 
+# It only explains .8 of the variance
 
 ```
 Now we are not happy, because for example ppcheck reveals that...
@@ -869,16 +955,16 @@ plot(m2.tv)
 # comments
 
 plot(conditional_effects(m2.tv), points = TRUE)
-# comments
+# almost no conditional effects
 
 pp_check(m2.tv, type = "dens_overlay")
-# comments
+# seems better
 
 pp_check(m2.tv, type = "error_scatter_avg")
-# comments
+# still has a correlation
 
 m2.tv_R2
-# comments
+# accounts for 2 percent of the variance.
 
 ```
 
@@ -934,16 +1020,16 @@ plot(m3.tv)
 #
 
 plot(conditional_effects(m3.tv), points = TRUE)
-#
+# almost no effect
 
 pp_check(m3.tv, type = "dens_overlay")
-# 
+# seems like a pretty good overlay
 
 pp_check(m3.tv, type = "error_scatter_avg")
-# 
+# there is some correlation but also lots of blobs
 
 m3.tv_R2
-# 
+# explains 43 percent of the variance
 
 ```
 ## MODEL FOUR: (Investigate other fixed effects)
@@ -989,7 +1075,7 @@ ggplot(data, aes(x = Gender, y = total_body_variability2D)) +
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m4.tv <- brm(
-  variability_shifted ~ generation_number_c + Age + Extroversion + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  variability_shifted ~ generation_number_c + Age_c + Extroversion_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 2000, warmup = 1000, cores = 4
@@ -1024,16 +1110,17 @@ plot(m4.tv)
 #
 
 plot(conditional_effects(m4.tv), points = TRUE)
-#
+# almost no correlation
 
 pp_check(m4.tv, type = "dens_overlay")
-# 
+# good overlay
 
 pp_check(m4.tv, type = "error_scatter_avg")
-# 
+# some correlation but also some blobbing
 
 
 m4.tv_R2
+# explains 65 percent of the variance.
 ```
 
 
