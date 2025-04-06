@@ -17,7 +17,7 @@ In this stats file, we answer questions about the iterated learning experiment c
 Part 1
 - Does generation have an effect on gesture space used?
 - Does generation have an effect on entropy used?
-- Does generation have an effect on temporal variaibility used?
+- Does generation have an effect on temporal variability used?
 - Does Age and Extroversion have an effect on gesture space, enotrpy, and temporal variability? (See Model Four)
 
 For part one, we test four different models for each of the first three questions. 
@@ -75,7 +75,7 @@ options(mc.cores = parallel::detectCores())
 
 ```{r loading_data, echo=TRUE, message=FALSE, warning=FALSE}
 
-data <- read_csv(paste0(datasets, "final_stats_dataframe.csv"))
+data <- read_csv(paste0(datasets, "final_stats_dataframe_aggregated.csv"))
 ```
 
 Here we look into structure of our data: what is distribution of gender, age, extroversion, number of languages for example
@@ -92,14 +92,18 @@ Also here you want to make sure all columns are of types you need - so for examp
 
 #data2$generation_number <- as.factor(data2$generation_number)
 data$participantID <- as.factor(data$participantID)
-data$chainID <- as.factor(data$chainID)
+data$chain_number <- as.factor(data$chain_number)
 data$gesture <- as.factor(data$gesture)
 data$Gender <- as.factor(data$Gender)
 
 data$Age <- as.numeric(data$Age)
 data$Extroversion <- as.numeric(data$Extroversion)
+data$NumOfNativeLanguages <- as.numeric(data$NumOfNativeLanguages)
 
 data$generation_number <- as.numeric(data$generation_number)
+data$total_distance <- as.numeric(data$total_distance)
+data$diff_in_age <- as.numeric(data$diff_in_age)
+data$diff_in_extrovet <- as.numeric(data$diff_in_extrovet)
 
 ```
 ## Data wrangling
@@ -112,10 +116,10 @@ data$generation_number_c <- data$generation_number - median(range(data$generatio
 ```
 Below, we adjust all of the entropy data by a constant (half the value of the minimum value), so we don't have any zeros in our data. (This is reasonable because zero entropy doesn't make sense anyway).
 ```{r}
- c <- min(data$total_body_entropy2D[data$total_body_entropy2D > 0]) / 2 # decide on a constant
-data$entropy_shifted <- data$total_body_entropy2D + c  # Shift all values
-c2 <-min(data$total_body_variability2D[data$total_body_variability2D > 0]) / 2
-data$variability_shifted <- data$total_body_variability2D + c2
+c <- min(data$total_body_entropy2Daggregated[data$total_body_entropy2Daggregated > 0]) / 2 # decide on a constant
+data$entropy_shifted <- data$total_body_entropy2Daggregated + c  # Shift all values
+c2 <-min(data$total_body_variability2Daggregated[data$total_body_variability2Daggregated > 0]) / 2
+data$variability_shifted <- data$total_body_variability2Daggregated + c2
 ```
 
 # Question One, part one: Generation v gesture space
@@ -276,7 +280,7 @@ We are still not acknowledging some structures of the data to the model. There i
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m3.gs <- brm(
-  total_gesture_space2D ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  total_gesture_space2D ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 4000, warmup = 2000, cores = 4
@@ -330,7 +334,7 @@ pp_check(m3.gs, type = "error_scatter_avg")
 
 
 m3.gs_R2
-# explains 67.32 of the variance!
+# explains 68.18 of the variance!
 
 ```
 
@@ -393,7 +397,7 @@ ggplot(data, aes(x = z_score_Age, y = total_gesture_space2D)) +
 ```{r}
 
 m4.gs <- brm(
-  total_gesture_space2D ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  total_gesture_space2D ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 2000, warmup = 1000, cores = 4, 
@@ -439,16 +443,13 @@ pp_check(m4.gs, type = "error_scatter_avg")
 
 
 m4.gs_R2
+# explains 65.96 percent of the variance
+```
+# MODEL FIVE: includes gender and num of languages as a fixed variable. Also has save pars as true and control  
 
-```
-# MODEL FIVE: CENTERED AGE AND EXTROVERSION (Doesn't change anything in the end, so you can ignore this one)
-```{r}
-data$Age_c <- data$Age - median(range(data$Age, na.rm = TRUE))
-data$Extroversion_c <- data$Extroversion - median(range(data$Extroversion,na.rm = TRUE))
-```
 ```{r}
 m5.gs <- brm(
-  total_gesture_space2D ~ generation_number_c + Age_c + Extroversion_c + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  total_gesture_space2D ~ generation_number_c + Age + Extroversion + Gender +NumOfNativeLanguages + (1 | participantID) + (1 | gesture) + (1 | chainID), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 2000, warmup = 1000, cores = 4,
@@ -465,9 +466,6 @@ m5.gs_R2 <- bayes_R2(m4.gs)
 # Save both as objects
 saveRDS(m5.gs, file.path(models, "m5.gs.rds"))
 saveRDS(m5.gs_R2, file.path(models, "m5.gs_R2.rds"))
-
-loo(m5.gs, moment_match = TRUE)
-loo_result <- loo(m5.gs, reloo = TRUE)
 
 beep(5)
 
@@ -494,6 +492,7 @@ pp_check(m5.gs, type = "error_scatter_avg")
 # how are the values correlated with residual error?
 
 m5.gs_R2
+# accounts for 66.4 percent of the variance
 ```
 # Question One, part two: Generation v Entropy
 Here we continue our first question (part two: entropy)
@@ -585,7 +584,7 @@ Now we are not happy, because for example ppcheck reveals that...
 
 As we inspected the outcome variable, we think that lognormal family could be maybe more appropriate. So we try it 
 
-## Model 2 lognormal
+## Model 2 lognormal - it actually doesn't make a difference whether I put log_entropy_shifted here or just entropy_shifted
 
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
@@ -605,7 +604,7 @@ data$log_entropy_shifted <- log(data$entropy_shifted_shifted)
 min(data$log_entropy_shifted)
 
 m2.et <- brm(
-  log_entropy_shifted ~ generation_number_c, 
+  entropy_shifted ~ generation_number_c, 
   data = data,
   family = lognormal(),  # Here we change lognormal
   chains = 4, iter = 2000, warmup = 1000, cores = 4
@@ -664,14 +663,14 @@ m2.et_R2
 
 We are still not acknowledging some structures of the data to the model. There is some variance coming from XYZ. So we want to add it into the model too
 
-## Model 3 - lognormal with random effects
+## Model 3 - lognormal with random effects 
 
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m3.et <- brm(
-  log_entropy_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  entropy_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
   data = data,
-  family = lognormal(),  # Normal distribution for continuous entropy
+  family = lognormal,  # (I tested gamma and gaussian and they didn't give me better results)
   chains = 4, iter = 4000, warmup = 2000, cores = 4
 )
 
@@ -724,7 +723,7 @@ pp_check(m3.et, type = "error_scatter_avg")
 
 
 m3.et_R2
-# 
+#  
 
 ```
 ## MODEL FOUR: (Investigate other fixed effects)
@@ -770,7 +769,7 @@ ggplot(data, aes(x = Gender, y = entropy_shifted)) +
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m4.et <- brm(
-  entropy_shifted ~ generation_number_c + Age + Extroversion + Gender + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  entropy_shifted ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 2000, warmup = 1000, cores = 4
@@ -784,6 +783,7 @@ m4.et_R2 <- bayes_R2(m4.et)
 
 # Save both as objects
 saveRDS(m4.et, file.path(models, "m4.et.rds"))
+
 saveRDS(m4.et_R2, file.path(models, "m4.et_R2.rds"))
 
 
@@ -816,9 +816,38 @@ pp_check(m4.et, type = "error_scatter_avg")
 
 m4.et_R2
 ```
+```{r}
+m5.et <- brm(
+  entropy_shifted ~ generation_number_c + Age + Extroversion + Gender + NumOfNativeLanguages + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
 
+# Add criterions for later diagnostics
+m5.et <- add_criterion(m5.et, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m5.et_R2 <- bayes_R2(m4.et)
+
+# Save both as objects
+saveRDS(m5.et, file.path(models, "m5.et.rds"))
+
+saveRDS(m5.et_R2, file.path(models, "m5.et_R2.rds"))
+
+
+beep(5)
+
+m5.et <- readRDS(file.path(models, "m5.et.rds"))
+m5.et_R2 <- readRDS(file.path(models, "m5.et_R2.rds"))
+
+
+# Summary
+summary(m5.et)
+
+```
 # Question One, part three: Generation v Temporal Variability
-Here we continue our first question (part two: entropy)
+Here we continue our first question (part three: temporal variability)
 
 1) We hypothesize that temporal variability decreases as a function of generation.
 
@@ -1075,7 +1104,7 @@ ggplot(data, aes(x = Gender, y = total_body_variability2D)) +
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m4.tv <- brm(
-  variability_shifted ~ generation_number_c + Age_c + Extroversion_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  variability_shifted ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chainID), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 2000, warmup = 1000, cores = 4
@@ -1332,8 +1361,82 @@ You can reuse the same model for the rest of the features - as long as you are w
 
 Now onto next question
 
-# Questions about age-gesture space etc. (see model four)
+# Questions about age-gesture space etc. (see model four of each section)
 
 
 # Questions about distance (rate of evolution)
-# not even sure what to ask or what to do here
+
+# 
+
+#tried to center the distance data even though I don't really know whether or not we need to. 
+```{r}
+data$total_distance_c <- data$total_distance - median(range(data$total_distance, na.rm = TRUE), na.rm = TRUE)
+
+min_val <- min(data$total_distance_c, na.rm = TRUE)
+
+if (min_val <= 0) {
+  shift_constant <- abs(min_val) + 1e-6  # small buffer to avoid exact zero
+  data$total_distance_c <- data$total_distance_c + shift_constant
+} else {
+  shift_constant <- 0  # already positive
+}
+
+hist(data$total_distance_c)
+```
+
+```{r}
+m1.dist <- brm(
+  total_distance_c ~ generation_number_c + diff_in_age + diff_in_extrovet + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  data = data,
+  family = lognormal(),  # Normal distribution for continuous entropy
+  chains = 4, iter = 2000, warmup = 1000, cores = 4
+)
+
+m1.dist <- add_criterion(m1.dist, criterion = c("loo", "waic"))
+
+# Calculate also variance explained (R^2)
+m1.dist_R2 <- bayes_R2(m1.dist)
+
+# Save both as objects
+saveRDS(m1.dist, file.path(models, "m1.dist.rds"))
+saveRDS(m1.dist_R2, file.path(models, "m1.dist_R2.rds"))
+
+
+beep(5)
+
+```
+ 
+And we do the same procedure
+
+```{r h1.m1 sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+m1.dist <- readRDS(file.path(models, "m1.dist.rds"))
+m1.dist_R2 <- readRDS(file.path(models, "m1.dist_R2.rds"))
+
+
+# Summary
+summary(m1.dist)
+
+```
+
+
+Let's also check the visuals
+
+```{r h1.m1 check, echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(m1.dist)
+# comments
+
+plot(conditional_effects(m1.dist), points = TRUE)
+# some conditional effects it seems like
+
+pp_check(m1.dist, type = "dens_overlay")
+# seems better
+
+pp_check(m1.dist, type = "error_scatter_avg")
+# no corrleation
+
+m1.dist_R2
+# accounts for 46 percent of the variance.
+
+```
