@@ -75,7 +75,7 @@ options(mc.cores = parallel::detectCores())
 
 ```{r loading_data, echo=TRUE, message=FALSE, warning=FALSE}
 
-data <- read_csv(paste0(datasets, "final_stats_dataframe_aggregated.csv"))
+data <- read_csv(paste0(datasets, "final_stats_dataframe.csv"))
 ```
 
 Here we look into structure of our data: what is distribution of gender, age, extroversion, number of languages for example
@@ -93,6 +93,7 @@ Also here you want to make sure all columns are of types you need - so for examp
 #data2$generation_number <- as.factor(data2$generation_number)
 data$participantID <- as.factor(data$participantID)
 data$chain_number <- as.factor(data$chain_number)
+
 data$gesture <- as.factor(data$gesture)
 data$Gender <- as.factor(data$Gender)
 
@@ -104,6 +105,8 @@ data$generation_number <- as.numeric(data$generation_number)
 data$total_distance <- as.numeric(data$total_distance)
 data$diff_in_age <- as.numeric(data$diff_in_age)
 data$diff_in_extrovet <- as.numeric(data$diff_in_extrovet)
+data$diff_in_gender <- as.factor(data$diff_in_gender)
+data$diff_in_TotalNativeLanguages <- as.numeric(data$diff_in_TotalNativeLanguages) ####IS THIS AS FACTOR OR AS NUMERIC?
 
 ```
 ## Data wrangling
@@ -182,8 +185,6 @@ Here we load the model so that we don't have to run the model again
 
 m1.gs <- readRDS(file.path(models, "m1.gs.rds"))
 m1.gs_R2 <- readRDS(file.path(models, "m1.gs_R2.rds"))
-
-
 # Summary
 summary(m1.gs)
 
@@ -199,13 +200,13 @@ plot(conditional_effects(m1.gs), points = TRUE)
 # also here about what effect you see or not see
 
 pp_check(m1.gs, type = "dens_overlay")
-# how well does the model predict future data?
+# how well does the model predict future data? It does an okay job. Not great.
 
 pp_check(m1.gs, type = "error_scatter_avg")
-# how are the values correlated with residual error?
+# how are the values correlated with residual error? High correlatio
 
-m1.gs_R2
-# how much variance the model explains? 
+m1.gs_R2 
+# how much variance the model explains? .8% of the variance
 
 ```
 Now we are not happy, because for example ppcheck reveals that...
@@ -443,7 +444,7 @@ pp_check(m4.gs, type = "error_scatter_avg")
 
 
 m4.gs_R2
-# explains 65.96 percent of the variance
+# explains 66.28 percent of the variance
 ```
 # MODEL FIVE: includes gender and num of languages as a fixed variable. Also has save pars as true and control  
 
@@ -486,13 +487,13 @@ plot(conditional_effects(m5.gs), points = TRUE)
 # also here about what effect you see or not see
 
 pp_check(m5.gs, type = "dens_overlay")
-# how well does the model predict future data?
+# how well does the model predict future data? well. 
 
 pp_check(m5.gs, type = "error_scatter_avg")
-# how are the values correlated with residual error?
+# how are the values correlated with residual error? not really correlated too much
 
 m5.gs_R2
-# accounts for 66.4 percent of the variance
+# accounts for 66.2 percent of the variance
 ```
 # Question One, part two: Generation v Entropy
 Here we continue our first question (part two: entropy)
@@ -571,13 +572,13 @@ plot(conditional_effects(m1.et), points = TRUE)
 # also here about what effect you see or not see
 
 pp_check(m1.et, type = "dens_overlay")
-# how well does the model predict future data?
+# how well does the model predict future data? meh
 
 pp_check(m1.et, type = "error_scatter_avg")
-# how are the values correlated with residual error?
+# how are the values correlated with residual error? lots of correlation
 
 m1.et_R2
-# how much variance the model explains? 
+# how much variance the model explains? .01
 
 ```
 Now we are not happy, because for example ppcheck reveals that...
@@ -648,16 +649,16 @@ plot(m2.et)
 # comments
 
 plot(conditional_effects(m2.et), points = TRUE)
-# comments
+# slgihtly negative
 
 pp_check(m2.et, type = "dens_overlay")
-# comments
+# comments # meh
 
 pp_check(m2.et, type = "error_scatter_avg")
-# comments
+# comments very correlatied
 
 m2.et_R2
-# comments
+# comments 1.3%
 
 ```
 
@@ -716,14 +717,14 @@ plot(conditional_effects(m3.et), points = TRUE)
 #
 
 pp_check(m3.et, type = "dens_overlay")
-# 
+# meh
 
 pp_check(m3.et, type = "error_scatter_avg")
-# 
+# not so correlated
 
 
 m3.et_R2
-#  
+#  explains 56.6% of the model
 
 ```
 ## MODEL FOUR: (Investigate other fixed effects)
@@ -808,13 +809,14 @@ plot(conditional_effects(m4.et), points = TRUE)
 #
 
 pp_check(m4.et, type = "dens_overlay")
-# 
+# meh
 
 pp_check(m4.et, type = "error_scatter_avg")
-# 
+# some correlation
 
 
 m4.et_R2
+# explains 55% of the data
 ```
 ```{r}
 m5.et <- brm(
@@ -920,7 +922,7 @@ plot(m1.tv)
 # make some comments of what you see - do you see nice hairy catterpillars?
 
 plot(conditional_effects(m1.tv), points = TRUE)
-# I do not see any effect of generation on temporal variability
+# I do not see any effect of generation on temporal variability. Slight decrease
 
 pp_check(m1.tv, type = "dens_overlay")
 # Does not predict future data well. 
@@ -929,7 +931,7 @@ pp_check(m1.tv, type = "error_scatter_avg")
 # High correlation between values and residentual error which is bad.
 
 m1.tv_R2
-# It only explains .8 of the variance
+# It only explains 1.1% of the variance
 
 ```
 Now we are not happy, because for example ppcheck reveals that...
@@ -1004,7 +1006,7 @@ We are still not acknowledging some structures of the data to the model. There i
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m3.tv <- brm(
-  variability_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  variability_shifted ~ generation_number_c + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 4000, warmup = 2000, cores = 4
@@ -1058,7 +1060,7 @@ pp_check(m3.tv, type = "error_scatter_avg")
 # there is some correlation but also lots of blobs
 
 m3.tv_R2
-# explains 43 percent of the variance
+# explains 32 percent of the variance. Yikes
 
 ```
 ## MODEL FOUR: (Investigate other fixed effects)
@@ -1104,7 +1106,7 @@ ggplot(data, aes(x = Gender, y = total_body_variability2D)) +
 ```{r h1.m1 model, eval=FALSE, message=FALSE, warning=FALSE}
 
 m4.tv <- brm(
-  variability_shifted ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chainID), 
+  variability_shifted ~ generation_number_c + Age + Extroversion + (1 | participantID) + (1 | gesture) + (1 | chain_number), 
   data = data,
   family = lognormal(),  # Normal distribution for continuous entropy
   chains = 4, iter = 2000, warmup = 1000, cores = 4
@@ -1149,7 +1151,7 @@ pp_check(m4.tv, type = "error_scatter_avg")
 
 
 m4.tv_R2
-# explains 65 percent of the variance.
+# explains 66 percent of the variance.
 ```
 
 
