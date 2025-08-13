@@ -6,3 +6,5 @@ ELAN_anno/.DS_Store
 /Testing_Animated_Videos
 Output_Videos.rar
 /Stimuli_videos
+*.avi
+*.mp4
